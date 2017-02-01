@@ -5,6 +5,7 @@ from time import sleep, strftime, time
 import logging
 import logging.handlers
 import requests
+import json
 
 # --------------------
 #
@@ -15,31 +16,32 @@ import requests
 #
 # --------------------
 
-# ------------ Methods
+# ------------ Read the temperature
 
 def get_temp():
     temp = check_output(["vcgencmd","measure_temp"]).decode("UTF-8")
     temp = float(findall("\d+\.\d+",temp)[0])
     return(temp)
 
-def write_log(temp):
-    tempF = (temp * 9 / 5) + 32
+# ------------ Logging
+
+def write_log(temp, tempF):
     cpu_logger.info("{0}\t{1:.1f}\t{2:.2f}".format(strftime("%Y-%m-%d %H:%M:%S"), temp, tempF))
 
-def write_firebase(temp, pi_name):
+# ------------ Write to firebase
+
+def write_firebase(temp, tempF):
     now = int(time())
-    queryParams = {'auth': 'ItdM8YVCzL5YBbiEM2sSax92JhficBxvFPPKBzXz'}
-    data = '{{"time":"{0}", "temperature":{1:.1f}}}'.format(strftime("%Y-%m-%d %H:%M:%S"), temp)
+    queryParams = {'auth': config.get('auth')}
+    data = '{{"time":"{0}", "temperature":{1:.1f}, "temperatureF":{2:.2f}}}'.format(strftime("%Y-%m-%d %H:%M:%S"), temp, tempF)
 
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{}/temperatures/{:d}.json'.format(pi_name, now)
-    response = requests.put(url, data=data, params=queryParams)
+    # write to temperatures (ongoing)
+    response = requests.put(getFirebaseUrl('temperatures/{:d}.json'.format(now)), data=data, params=queryParams)
+    # write to current
+    response = requests.put(getFirebaseUrl('current.json'), data=data, params=queryParams)
 
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{}/current.json'.format(pi_name)
-    response = requests.put(url, data=data, params=queryParams)
-
-# ------------ Data setup
-
-pi_name = 'work-retropi'
+def getFirebaseUrl(path):
+    return '{}/{}/{}'.format(config.get('base_url'), config.get('pi_name'), path)
 
 # ------------ Log Setup
 
@@ -49,8 +51,14 @@ cpu_logger.setLevel(logging.INFO)
 handler = logging.handlers.RotatingFileHandler(file_name, maxBytes=200*1024, backupCount=5)
 cpu_logger.addHandler(handler)
 
+# ------------ Data setup
+
+config = json.load(open("config.json"))
+
 # ------------ Do the Work
 
 temp = get_temp()
-write_log(temp)
-write_firebase(temp, pi_name)
+tempF = (temp * 9 / 5) + 32
+
+write_log(temp, tempF)
+write_firebase(temp, tempF)
