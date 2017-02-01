@@ -1,52 +1,64 @@
 import requests
 import time
+import json
+
+# ------------ Do data need to roll
+def roll_data_if_needed(secondsAllowed):
+    # calculate last time
+    last_roll_time = get_status()
+    now = int(time.time())
+    time_since_roll = now - last_roll_time
+    # do I need to roll?
+    if time_since_roll > secondsAllowed:
+        roll_data()
+    else:
+        print 'do not roll'
 
 # ------------ Get current status
-def get_status(pi_name):
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/status.json'.format(pi_name)
-    query_params = {'auth': 'ItdM8YVCzL5YBbiEM2sSax92JhficBxvFPPKBzXz'}
-    response = requests.get(url, params=query_params)
+def get_status():
+    response = firebaseGet('status.json')
     json = response.json()
     return json.get('lastRollTime')
 
-# ------------ Do data need to roll
-def roll_data_if_needed(pi_name, secondsAllowed):
-    last_roll_time = get_status(pi_name)
-    now = int(time.time())
-    time_since_roll = now - last_roll_time
-    if time_since_roll > secondsAllowed:
-        roll_data(pi_name)
-    else:
-        print time_since_roll
-        print secondsAllowed
-        print 'do not roll'
 
-def roll_data(pi_name):
-    query_params = {'auth': 'ItdM8YVCzL5YBbiEM2sSax92JhficBxvFPPKBzXz'}
-
+# ------------ Roll the data
+def roll_data():
     # delete backup
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/temperatures-backup.json'.format(pi_name)
-    requests.delete(url, params=query_params)
+    firebaseDelete('temperatures-backup.json')
 
     # update status time
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/status.json'.format(pi_name)
     data = '{{"lastRollTime": {:d}}}'.format(int(time.time()))
-    response = requests.put(url, params=query_params, data=data)
+    firebasePut('status.json', data)
 
     # get current values
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/temperatures.json'.format(pi_name)
-    response = requests.get(url, params=query_params)
+    response = firebaseGet('temperatures.json')
     current_values = response.text
-    print current_values
 
     # add to backup
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/temperatures-backup.json'.format(pi_name)
-    requests.put(url, params=query_params, data=current_values)
+    firebasePut('temperatures-backup.json', current_values)
 
     # delete current values
-    url = 'https://pi-temperature-c369d.firebaseio.com/temperature/{0}/temperatures.json'.format(pi_name)
-    requests.delete(url, params=query_params)
+    firebaseDelete('temperatures.json')
 
+# ------------ Firebase calls
+def firebaseGet(path):
+    return requests.get(getFirebaseUrl(path), params=getFirebaseQueryParams())
+
+def firebasePut(path, data):
+    requests.put(getFirebaseUrl(path), params=getFirebaseQueryParams(), data=data)
+
+def firebaseDelete(path):
+    return requests.delete(getFirebaseUrl(path), params=getFirebaseQueryParams())
+
+def getFirebaseQueryParams():
+    return {'auth': config.get('auth')}
+
+def getFirebaseUrl(path):
+    return '{}/{}/{}'.format(config.get('base_url'), config.get('pi_name'), path)
+
+# ------------ Data setup
+
+config = json.load(open("config.json"))
 
 # ------------ Let's do this
-roll_data_if_needed('home-test', 10)
+roll_data_if_needed(60*60*24)

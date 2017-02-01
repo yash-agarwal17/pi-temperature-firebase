@@ -19,9 +19,12 @@ import json
 # ------------ Read the temperature
 
 def get_temp():
-    temp = check_output(["vcgencmd","measure_temp"]).decode("UTF-8")
-    temp = float(findall("\d+\.\d+",temp)[0])
-    return(temp)
+    #temp = check_output(["vcgencmd","measure_temp"]).decode("UTF-8")
+    #temp = float(findall("\d+\.\d+",temp)[0])
+    #return(temp)
+
+    # for testing
+    return 100
 
 # ------------ Logging
 
@@ -32,13 +35,20 @@ def write_log(temp, tempF):
 
 def write_firebase(temp, tempF):
     now = int(time())
-    queryParams = {'auth': config.get('auth')}
     data = '{{"time":"{0}", "temperature":{1:.1f}, "temperatureF":{2:.2f}}}'.format(strftime("%Y-%m-%d %H:%M:%S"), temp, tempF)
 
     # write to temperatures (ongoing)
-    response = requests.put(getFirebaseUrl('temperatures/{:d}.json'.format(now)), data=data, params=queryParams)
+    firebasePut('temperatures/{:d}.json'.format(now), data)
     # write to current
-    response = requests.put(getFirebaseUrl('current.json'), data=data, params=queryParams)
+    firebasePut('current.json'.format(now), data)
+
+# ------------ Firebase calls
+
+def firebasePut(path, data):
+    requests.put(getFirebaseUrl(path), params=getFirebaseQueryParams(), data=data)
+
+def getFirebaseQueryParams():
+    return {'auth': config.get('auth')}
 
 def getFirebaseUrl(path):
     return '{}/{}/{}'.format(config.get('base_url'), config.get('pi_name'), path)
