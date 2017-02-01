@@ -19,12 +19,12 @@ import json
 # ------------ Read the temperature
 
 def get_temp():
-    #temp = check_output(["vcgencmd","measure_temp"]).decode("UTF-8")
-    #temp = float(findall("\d+\.\d+",temp)[0])
-    #return(temp)
+    temp = check_output(["vcgencmd","measure_temp"]).decode("UTF-8")
+    temp = float(findall("\d+\.\d+",temp)[0])
+    return(temp)
 
     # for testing
-    return 100
+    #return 100
 
 # ------------ Logging
 
