@@ -8,6 +8,10 @@ This project consists of 2 python scripts that can be run on a raspberry pi that
 
 You will need to copy the two scripts to your pi. One easy way would be to just clone this repo.
 
+### Config
+
+You will need to rename the `config.json.example` to be `config.json` and fill in your specific information.
+
 ### Cron Scheduling
 
 You also need to set up the scripts to run on a regular basis. To do this, you should use `crontab`.
