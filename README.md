@@ -10,7 +10,7 @@ You will need to copy the two scripts to your pi. One easy way would be to just 
 
 ### Config
 
-You will need to rename the `config.json.example` to be `config.json` and fill in your specific information.
+You will need to copy the `config.json.example` to your home directory (`~/`), rename it to `config.json`, and fill in your specific information.
 
 ### Cron Scheduling
 
@@ -20,8 +20,8 @@ You also need to set up the scripts to run on a regular basis. To do this, you s
 2. Use the following cron settings, or adjust to report as frequently as you want.
 
 ```
-* * * * * python /home/pi/temperatureMonitor/temp_monitor.py
-0 * * * * python /home/pi/temperatureMonitor/roll_firebase_logs.py
+* * * * * python /home/pi/pi-temperature-firebase/temp_monitor.py
+0 * * * * python /home/pi/pi-temperature-firebase/roll_firebase_logs.py
 ```
 
 This will record the temperature every minute (first line), and check if the logs need to roll every hour (second line). Note that the `roll_firebase_logs.py` will check the last time it rolled first, and only update as often as defined in that script.
@@ -82,3 +82,8 @@ The `requests` python package is used to make the REST API calls to Firebase. Mo
 Assuming you have `pip` installed, all you need to do is:
 
 1. `sudo pip install requests`
+
+## Next Steps
+
+- [ ] Make output log file configurable - not just at ~/
+- [ ] Make config file be somewhere other than ~/
