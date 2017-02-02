@@ -28,13 +28,15 @@ This will record the temperature every minute (first line), and check if the log
 
 Make sure the paths defined point to your scripts.
 
-## Scripts
+## More Information
+
+### Scripts
 
 The first script, `temp_monitor.py` just measures the internal temperature using `vcgencmd`, logs it to a file, and posts it to firebase. The logging will just go to your home directory in a file called 'cpu_temp_log.tsv'.
 
 The second script, `firebase_log_roll.py` is used so you don't keep too much data in firebase by removing old data. By default, it will delete that data once a day, so at most you'll have about two days of data, and at a minimum you'll have one.
 
-## Graph
+### Graph
 
 In addition to recording the temperature, I also have a simple HTML page that uses D3 to graph the temperature. It pulls data directly from Firebase to plot a simple line chart.
 
