@@ -63,7 +63,7 @@ cpu_logger.addHandler(handler)
 
 # ------------ Data setup
 
-config = json.load(open("config.json"))
+config = json.load(open("~/config.json"))
 
 # ------------ Do the Work
 

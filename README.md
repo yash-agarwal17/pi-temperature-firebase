@@ -63,7 +63,8 @@ Under Database > Rules:
     ".read": "auth != null",
     ".write": "auth != null"
   }
-}```
+}
+```
 
 ## Python Dependencies
 
