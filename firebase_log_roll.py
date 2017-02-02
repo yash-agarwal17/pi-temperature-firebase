@@ -58,7 +58,7 @@ def getFirebaseUrl(path):
 
 # ------------ Data setup
 
-config = json.load(open("~/config.json"))
+config = json.load(open("/home/pi/config.json"))
 
 # ------------ Let's do this
 roll_data_if_needed(60*60*24)
