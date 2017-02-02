@@ -21,7 +21,7 @@ You also need to set up the scripts to run on a regular basis. To do this, you s
 
 ```
 * * * * * python /home/pi/pi-temperature-firebase/temp_monitor.py
-0 * * * * python /home/pi/pi-temperature-firebase/roll_firebase_logs.py
+0 * * * * python /home/pi/pi-temperature-firebase/firebase_log_roll.py
 ```
 
 This will record the temperature every minute (first line), and check if the logs need to roll every hour (second line). Note that the `roll_firebase_logs.py` will check the last time it rolled first, and only update as often as defined in that script.
