@@ -58,7 +58,8 @@ Under [Gear] > Project Settings > Service Accounts > Database Secrets
 
 Under Database > Rules:
 
-```{
+```
+{
   "rules": {
     ".read": "auth != null",
     ".write": "auth != null"
