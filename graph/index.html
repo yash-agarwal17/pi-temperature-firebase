@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<h1 id="title"></h1>
 <svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
@@ -64,4 +65,5 @@ d3.json(baseUrl + piName + "/temperatures.json?auth=" + auth, function(error, js
       .attr("d", line);
 });
 
+document.getElementById("title").innerHTML = piName;
 </script>
